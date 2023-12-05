@@ -1,5 +1,5 @@
 /**
- * \author {AUTHOR}
+ * \author Wout L.
  */
 
 #ifndef _CONFIG_H_
