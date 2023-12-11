@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <inttypes.h>
 #include <pthread.h>
 #include <sys/time.h>
@@ -20,10 +21,16 @@ typedef struct {
     sbuffer_t *buffer;
 } thread_data_t;
 
-int init_connection_manager(int max_conn, int port, sbuffer_t *buffer) {
-    
-    int MAX_CONN = max_conn;
-    int PORT = port;
+int conn_mgr_fd = -1;
+char conn_mgr_log_message[SIZE];
+
+void *init_connection_manager(void *vargp) {
+
+    conn_mgr_data_t *conn_mgr_data = (conn_mgr_data_t *)vargp;
+    int MAX_CONN = conn_mgr_data->max_conn;
+    int PORT = conn_mgr_data->port;
+    conn_mgr_fd = conn_mgr_data->pipe_write_end;
+    sbuffer_t *BUFFER = conn_mgr_data->buffer;
 
     pthread_t tid[MAX_CONN];
     tcpsock_t *server, *client[MAX_CONN];
@@ -38,7 +45,7 @@ int init_connection_manager(int max_conn, int port, sbuffer_t *buffer) {
         if (tcp_wait_for_connection(server, &client[conn_counter]) != TCP_NO_ERROR) exit(EXIT_FAILURE);
 
         data->client=client[conn_counter];
-        data->buffer=buffer;
+        data->buffer=BUFFER;
         pthread_create(&tid[conn_counter], NULL, connectionHandler, data);
     }
 
@@ -57,11 +64,12 @@ int init_connection_manager(int max_conn, int port, sbuffer_t *buffer) {
     sensor_data->value = 0;
     sensor_data->ts = 0;
 
-    sbuffer_insert(buffer, sensor_data);
+    sbuffer_insert(BUFFER, sensor_data);
 
+    /*
     while(1){
 
-        if(sbuffer_remove(buffer,sensor_data) == SBUFFER_NO_DATA){
+        if(sbuffer_remove(BUFFER,sensor_data) == SBUFFER_NO_DATA){
             break;
         }
 
@@ -69,6 +77,7 @@ int init_connection_manager(int max_conn, int port, sbuffer_t *buffer) {
                 (long int) sensor_data->ts);
 
     }
+     */
     free(sensor_data);
 
     return 0;
@@ -78,6 +87,7 @@ int init_connection_manager(int max_conn, int port, sbuffer_t *buffer) {
 void *connectionHandler(void *vargp){
     int bytes, result;
     sensor_data_t data;
+    bool first_data = true;
 
     thread_data_t *thread_data = (thread_data_t *)vargp;
     tcpsock_t *client = thread_data->client;
@@ -115,6 +125,11 @@ void *connectionHandler(void *vargp){
             break;
         }
          */
+        if (first_data){
+            first_data = false;
+            sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has opened a new connection", data.id);
+            write(conn_mgr_fd, conn_mgr_log_message, SIZE);
+        }
 
     } while (result == TCP_NO_ERROR);
 
@@ -124,6 +139,9 @@ void *connectionHandler(void *vargp){
     else
         printf("Error occured on connection to peer\n");
     */
+
+    sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has closed the connection", data.id);
+    write(conn_mgr_fd, conn_mgr_log_message, SIZE);
 
     tcp_close(&client);
     return 0;

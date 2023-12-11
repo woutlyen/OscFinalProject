@@ -4,5 +4,12 @@
 
 #include "sbuffer.h"
 
-int init_connection_manager(int max_conn, int port, sbuffer_t *buffer);
+typedef struct {
+    int max_conn;
+    int port;
+    int pipe_write_end;
+    sbuffer_t *buffer;
+} conn_mgr_data_t;
+
+void *init_connection_manager(void *vargp);
 void *connectionHandler(void *vargp);

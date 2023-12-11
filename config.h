@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include <stdbool.h>
 
 typedef uint16_t sensor_id_t;
 typedef double sensor_value_t;
@@ -17,5 +18,7 @@ typedef struct {
     sensor_value_t value;
     sensor_ts_t ts;
 } sensor_data_t;
+
+#define SIZE 128
 
 #endif /* _CONFIG_H_ */
