@@ -45,7 +45,7 @@ int element_compare(void * x, void * y) {
 
 
 void *init_data_manager(void *vargp){
-    return 0;
+    //return 0;
     data_mgr_data_t *data = (data_mgr_data_t *)vargp;
     sbuffer_t *buffer = data->buffer;
     data_mgr_fd = data->pipe_write_end;

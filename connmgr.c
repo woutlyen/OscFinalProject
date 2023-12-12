@@ -23,7 +23,6 @@ typedef struct {
 } thread_data_t;
 
 int conn_mgr_fd = -1;
-char conn_mgr_log_message[SIZE];
 
 void *init_connection_manager(void *vargp) {
 
@@ -128,6 +127,8 @@ void *connectionHandler(void *vargp){
          */
         if (first_data){
             first_data = false;
+
+            char conn_mgr_log_message[SIZE];
             sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has opened a new connection", data.id);
             write(conn_mgr_fd, conn_mgr_log_message, SIZE);
         }
@@ -141,8 +142,11 @@ void *connectionHandler(void *vargp){
         printf("Error occured on connection to peer\n");
     */
 
-    sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has closed the connection", data.id);
-    write(conn_mgr_fd, conn_mgr_log_message, SIZE);
+    if (result == TCP_CONNECTION_CLOSED) {
+        char conn_mgr_log_message[SIZE];
+        sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has closed the connection", data.id);
+        write(conn_mgr_fd, conn_mgr_log_message, SIZE);
+    }
 
     tcp_close(&client);
     return 0;

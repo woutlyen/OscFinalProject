@@ -14,6 +14,7 @@
 #define RUN_AVG_LENGTH 5
 #endif
 
+
 #ifndef SET_MAX_TEMP
 #error SET_MAX_TEMP not set
 #endif
