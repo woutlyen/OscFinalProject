@@ -58,4 +58,8 @@ dkms.conf
 *.csv
 *.log
 
+file_creator
+sensor_gateway
+sensor_node
+
 # End of https://www.toptal.com/developers/gitignore/api/c

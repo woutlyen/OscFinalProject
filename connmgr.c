@@ -8,6 +8,7 @@
 #include <inttypes.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <stdbool.h>
 #include "config.h"
 #include "lib/tcpsock.h"
 #include "connmgr.h"

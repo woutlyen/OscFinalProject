@@ -11,6 +11,7 @@
 
 #include "connmgr.h"
 #include "sensor_db.h"
+#include "datamgr.h"
 #include "sbuffer.h"
 
 #define READ_END 0
@@ -144,11 +145,17 @@ int main(int argc, char *argv[]){
     storage_mgr_data->buffer = buffer;
     storage_mgr_data->pipe_write_end = pipe_write_end;
 
+    data_mgr_data_t *data_mgr_data = malloc(sizeof(data_mgr_data_t));
+    data_mgr_data->buffer = buffer;
+    data_mgr_data->pipe_write_end = pipe_write_end;
+
     pthread_create(&conn_mgr_thread_id, NULL, init_connection_manager, conn_mgr_data);
     pthread_create(&store_mgr_thread_id, NULL, init_storage_manager, storage_mgr_data);
+    pthread_create(&data_mgr_thread_id, NULL, init_data_manager, data_mgr_data);
 
     pthread_join(conn_mgr_thread_id, NULL);
-    pthread_join(store_mgr_thread_id, NULL);
+    //pthread_join(store_mgr_thread_id, NULL);
+    pthread_join(data_mgr_thread_id, NULL);
 
     if (sbuffer_free(&buffer) == SBUFFER_FAILURE){
         return -1;
