@@ -101,7 +101,16 @@ void *connectionHandler(void *vargp){
     do {
         // read sensor ID
         bytes = sizeof(data.id);
-        result = tcp_receive(client, (void *) &data.id, &bytes);
+        result = tcp_receive_timeout(client, (void *) &data.id, &bytes, TIMEOUT);
+        printf("%d\n", result);
+        if (result != 0 && result != 4){
+            char conn_mgr_log_message[SIZE];
+            sprintf(conn_mgr_log_message, "TIME-OUT");
+            write(conn_mgr_fd, conn_mgr_log_message, SIZE);
+            result = TCP_CONNECTION_CLOSED;
+            break;
+        }
+
         // read temperature
         bytes = sizeof(data.value);
         result = tcp_receive(client, (void *) &data.value, &bytes);
