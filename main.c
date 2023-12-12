@@ -154,12 +154,14 @@ int main(int argc, char *argv[]){
     pthread_create(&data_mgr_thread_id, NULL, init_data_manager, data_mgr_data);
 
     pthread_join(conn_mgr_thread_id, NULL);
-    //pthread_join(store_mgr_thread_id, NULL);
+    pthread_join(store_mgr_thread_id, NULL);
     pthread_join(data_mgr_thread_id, NULL);
 
     if (sbuffer_free(&buffer) == SBUFFER_FAILURE){
         return -1;
     }
+
+    close(pipe_write_end);
 
     end_log_process();
     return 0;

@@ -21,7 +21,7 @@ int open_db(){
 
 
 void *init_storage_manager(void *vargp){
-    return 0;
+    //return 0;
     storage_mgr_data_t *data = (storage_mgr_data_t*)vargp;
     sbuffer_t *buffer = data->buffer;
     storage_mgr_fd = data->pipe_write_end;

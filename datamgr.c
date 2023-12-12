@@ -45,7 +45,7 @@ int element_compare(void * x, void * y) {
 
 
 void *init_data_manager(void *vargp){
-
+    return 0;
     data_mgr_data_t *data = (data_mgr_data_t *)vargp;
     sbuffer_t *buffer = data->buffer;
     data_mgr_fd = data->pipe_write_end;
@@ -71,7 +71,7 @@ void *init_data_manager(void *vargp){
 
 
     //Reading and adding all the assigned sensor data in the list
-    while(sbuffer_remove(buffer, sensor_data) != SBUFFER_NO_DATA) {
+    while(sbuffer_get_data(buffer, sensor_data) != SBUFFER_NO_DATA) {
 
         //Print the time_t in human language
         //printf("%s", asctime(gmtime(&timestamp)));

@@ -10,6 +10,10 @@
 pthread_mutex_t lock;
 pthread_cond_t cond;
 
+pthread_mutex_t read_lock;
+pthread_cond_t read_cond;
+pthread_cond_t remove_cond;
+
 /**
  * basic node for the buffer, these nodes are linked together to create the buffer
  */
@@ -26,6 +30,8 @@ struct sbuffer {
     sbuffer_node_t *tail;       /**< a pointer to the last node in the buffer */
 };
 
+int condition = 0;
+
 int sbuffer_init(sbuffer_t **buffer) {
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
@@ -33,6 +39,18 @@ int sbuffer_init(sbuffer_t **buffer) {
     }
 
     if (pthread_cond_init(&cond, NULL) != 0) {
+        return SBUFFER_FAILURE;
+    }
+
+    if (pthread_mutex_init(&read_lock, NULL) != 0) {
+        return SBUFFER_FAILURE;
+    }
+
+    if (pthread_cond_init(&read_cond, NULL) != 0) {
+        return SBUFFER_FAILURE;
+    }
+
+    if (pthread_cond_init(&remove_cond, NULL) != 0) {
         return SBUFFER_FAILURE;
     }
 
@@ -58,6 +76,30 @@ int sbuffer_free(sbuffer_t **buffer) {
 
     pthread_cond_destroy(&cond);
     pthread_mutex_destroy(&lock);
+
+    return SBUFFER_SUCCESS;
+}
+
+
+int sbuffer_get_data(sbuffer_t *buffer, sensor_data_t *data) {
+
+    if (buffer == NULL) {
+        return SBUFFER_FAILURE;
+    }
+
+    pthread_mutex_lock(&lock);
+
+    while (buffer->head == NULL) {
+        pthread_cond_wait(&cond, &lock);
+    }
+
+    *data = buffer->head->data;
+
+    if (data->id == 0){
+        pthread_mutex_unlock(&lock);
+        return SBUFFER_NO_DATA;
+    }
+    pthread_mutex_unlock(&lock);
 
     return SBUFFER_SUCCESS;
 }
