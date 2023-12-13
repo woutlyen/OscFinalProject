@@ -61,5 +61,7 @@ dkms.conf
 file_creator
 sensor_gateway
 sensor_node
+*.sh
+sensor_data
 
 # End of https://www.toptal.com/developers/gitignore/api/c

@@ -39,6 +39,7 @@ void *init_storage_manager(void *vargp){
     }
 
     close_db();
+    free(sensor_data);
     return 0;
 }
 

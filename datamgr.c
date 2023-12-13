@@ -120,6 +120,7 @@ void *init_data_manager(void *vargp){
     free(element);
     free(sensor_data);
 
+    datamgr_free();
     return 0;
 }
 

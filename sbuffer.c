@@ -70,6 +70,8 @@ int sbuffer_free(sbuffer_t **buffer) {
     free(*buffer);
     *buffer = NULL;
 
+    pthread_cond_destroy(&read_cond);
+    pthread_mutex_destroy(&read_lock);
     pthread_cond_destroy(&cond);
     pthread_mutex_destroy(&lock);
 

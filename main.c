@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <inttypes.h>
 
 #include "connmgr.h"
 #include "sensor_db.h"
@@ -98,7 +99,7 @@ int create_log_process(){
         // Close the write end of the child
         close(fd[WRITE_END]);
 
-        char msg[SIZE];
+        char msg[SIZE] = "";
         while (strcmp(msg,"END") != 0){
 
             long length = read(fd[READ_END], &msg, SIZE);
@@ -153,6 +154,34 @@ int main(int argc, char *argv[]){
     pthread_create(&store_mgr_thread_id, NULL, init_storage_manager, storage_mgr_data);
     pthread_create(&data_mgr_thread_id, NULL, init_data_manager, data_mgr_data);
 
+
+    /*
+    FILE * fp_sensor_data = fopen("sensor_data", "rb");
+    sensor_data_t *sensor_data = (sensor_data_t*)malloc(sizeof(sensor_data_t));
+    ERROR_HANDLER(!sensor_data, "Malloc of the sensor_data Struct failed");
+    uint16_t *sensor_id_t = &sensor_data->id;
+    double *sensor_value_t = &sensor_data->value;
+    time_t *sensor_ts_t = &sensor_data->ts;
+
+    //Reading and adding all the assigned sensor data in the list
+    while(fread(sensor_id_t, sizeof(uint16_t), 1, fp_sensor_data) != 0) {
+        fread(sensor_value_t, sizeof(double), 1, fp_sensor_data);
+        fread(sensor_ts_t, sizeof(time_t), 1, fp_sensor_data);
+
+        sbuffer_insert(buffer, sensor_data);
+        //printf("sensor id = %" PRIu16 " - temperature = %f - timestamp = %ld\n", sensor_data->id, sensor_data->value,
+         //       (long int) sensor_data->ts);
+    }
+
+    sensor_data->id = 0;
+    sensor_data->value = 0;
+    sensor_data->ts = 0;
+    sbuffer_insert(buffer, sensor_data);
+
+    fclose(fp_sensor_data);
+    free(sensor_data);
+    */
+
     pthread_join(conn_mgr_thread_id, NULL);
     pthread_join(store_mgr_thread_id, NULL);
     pthread_join(data_mgr_thread_id, NULL);
@@ -163,6 +192,9 @@ int main(int argc, char *argv[]){
 
     close(pipe_write_end);
 
-    end_log_process();
+    free(conn_mgr_data);
+    free(storage_mgr_data);
+    free(data_mgr_data);
+
     return 0;
 }
