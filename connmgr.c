@@ -1,5 +1,5 @@
 /**
- * \author Wout L.
+ * \author Wout Lyen
  */
 
 #include <stdio.h>

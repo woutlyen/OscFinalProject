@@ -1,12 +1,11 @@
-
+/**
+ * \author Wout Lyen
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 #include "dplist.h"
-
-
-
 
 /*
  * The real definition of struct list / struct node

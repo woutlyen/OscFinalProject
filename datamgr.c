@@ -1,5 +1,5 @@
 /**
- * \Author: Wout Lyen
+ * \Author Wout Lyen
  */
 
 #include "datamgr.h"

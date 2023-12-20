@@ -1,5 +1,5 @@
 /**
- * \author {AUTHOR}
+ * \author Wout Lyen
  */
 
 #ifndef DATAMGR_H_

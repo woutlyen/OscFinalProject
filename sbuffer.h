@@ -1,5 +1,5 @@
 /**
- * \author {AUTHOR}
+ * \author Wout Lyen
  */
 
 #ifndef _SBUFFER_H_

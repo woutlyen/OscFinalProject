@@ -1,5 +1,5 @@
 /**
- * \author {AUTHOR}
+ * \author Wout Lyen
  */
 
 #ifndef _DPLIST_H_

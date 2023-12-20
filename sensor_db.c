@@ -1,6 +1,7 @@
-//
-// Created by Wout Lyen on 14/11/23.
-//
+/**
+ * \author Wout Lyen
+ */
+
 #include <unistd.h>
 #include <string.h>
 #include <inttypes.h>

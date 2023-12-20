@@ -1,5 +1,5 @@
 /**
- * \author Wout L.
+ * \author Wout Lyen
  */
 
 #ifndef _CONFIG_H_
