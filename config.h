@@ -20,5 +20,12 @@ typedef struct {
 
 #define SIZE 128
 
+#ifndef SET_MAX_TEMP
+#define SET_MAX_TEMP 20
+#endif // !SET_MAX_TEMP
+
+#ifndef SET_MIN_TEMP
+#define SET_MIN_TEMP 10
+#endif // !SET_MIN_TEMP
 
 #endif /* _CONFIG_H_ */

@@ -47,6 +47,7 @@ int write_to_log_process(char *msg){
 
     // Check if print succeeded
     if(value <=0){
+        fclose(file);
         return -1;
     }
 
