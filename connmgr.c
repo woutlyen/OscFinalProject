@@ -60,22 +60,10 @@ void *init_connection_manager(void *vargp) {
 
     sbuffer_insert(buffer_connmgr, sensor_data);
 
-    /*
-    while(1){
 
-        if(sbuffer_remove(BUFFER,sensor_data) == SBUFFER_NO_DATA){
-            break;
-        }
-
-        printf("sensor id = %" PRIu16 " - temperature = %f - timestamp = %ld\n", sensor_data->id, sensor_data->value,
-                (long int) sensor_data->ts);
-
-    }
-     */
     free(sensor_data);
 
     pthread_exit(0);
-    return 0;
 }
 
 
