@@ -28,4 +28,8 @@ typedef struct {
 #define SET_MIN_TEMP 10
 #endif // !SET_MIN_TEMP
 
+#ifndef TIMEOUT
+#define TIMEOUT 5
+#endif // !TIMEOUT
+
 #endif /* _CONFIG_H_ */
