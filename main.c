@@ -8,7 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <inttypes.h>
 
 #include "connmgr.h"
 #include "sensor_db.h"
@@ -121,6 +120,7 @@ int create_log_process(){
 
 int main(int argc, char *argv[]){
 
+    //init thread ids
     pthread_t conn_mgr_thread_id, data_mgr_thread_id, store_mgr_thread_id;
 
     if(argc < 3) {
@@ -128,15 +128,17 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
+    //Reading out program arguments
     int MAX_CONN = atoi(argv[2]);
     int PORT = atoi(argv[1]);
 
+    //init pipe and sbuffer
     pipe_write_end = create_log_process();
-
     if (sbuffer_init(&buffer) == SBUFFER_FAILURE){
         return -1;
     }
 
+    //loading data for threads in structs
     conn_mgr_data_t *conn_mgr_data = malloc(sizeof(conn_mgr_data_t));
     conn_mgr_data->max_conn = MAX_CONN;
     conn_mgr_data->port = PORT;
@@ -151,48 +153,24 @@ int main(int argc, char *argv[]){
     data_mgr_data->buffer = buffer;
     data_mgr_data->pipe_write_end = pipe_write_end;
 
+
+    //starting the threads
     pthread_create(&conn_mgr_thread_id, NULL, init_connection_manager, conn_mgr_data);
     pthread_create(&store_mgr_thread_id, NULL, init_storage_manager, storage_mgr_data);
     pthread_create(&data_mgr_thread_id, NULL, init_data_manager, data_mgr_data);
 
-
-    /*
-    FILE * fp_sensor_data = fopen("sensor_data", "rb");
-    sensor_data_t *sensor_data = (sensor_data_t*)malloc(sizeof(sensor_data_t));
-    ERROR_HANDLER(!sensor_data, "Malloc of the sensor_data Struct failed");
-    uint16_t *sensor_id_t = &sensor_data->id;
-    double *sensor_value_t = &sensor_data->value;
-    time_t *sensor_ts_t = &sensor_data->ts;
-
-    //Reading and adding all the assigned sensor data in the list
-    while(fread(sensor_id_t, sizeof(uint16_t), 1, fp_sensor_data) != 0) {
-        fread(sensor_value_t, sizeof(double), 1, fp_sensor_data);
-        fread(sensor_ts_t, sizeof(time_t), 1, fp_sensor_data);
-
-        sbuffer_insert(buffer, sensor_data);
-        //printf("sensor id = %" PRIu16 " - temperature = %f - timestamp = %ld\n", sensor_data->id, sensor_data->value,
-         //       (long int) sensor_data->ts);
-    }
-
-    sensor_data->id = 0;
-    sensor_data->value = 0;
-    sensor_data->ts = 0;
-    sbuffer_insert(buffer, sensor_data);
-
-    fclose(fp_sensor_data);
-    free(sensor_data);
-    */
-
+    //wait until every thread finished
     pthread_join(conn_mgr_thread_id, NULL);
     pthread_join(store_mgr_thread_id, NULL);
     pthread_join(data_mgr_thread_id, NULL);
 
+    //end buffer ad pipe
     if (sbuffer_free(&buffer) == SBUFFER_FAILURE){
         return -1;
     }
-
     close(pipe_write_end);
 
+    //free all the malloced structs
     free(conn_mgr_data);
     free(storage_mgr_data);
     free(data_mgr_data);
