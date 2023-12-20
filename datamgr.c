@@ -45,7 +45,8 @@ int element_compare(void * x, void * y) {
 
 
 void *init_data_manager(void *vargp){
-    //return 0;
+
+    //Reading out the provided variables
     data_mgr_data_t *data = (data_mgr_data_t *)vargp;
     sbuffer_t *buffer = data->buffer;
     data_mgr_fd = data->pipe_write_end;
@@ -73,28 +74,32 @@ void *init_data_manager(void *vargp){
     //Reading and adding all the assigned sensor data in the list
     while(sbuffer_get_data(buffer, sensor_data) != SBUFFER_NO_DATA) {
 
-        //Print the time_t in human language
-        //printf("%s", asctime(gmtime(&timestamp)));
-
-        for (int count = 0; count < dpl_size(list); count++) {
+        //loop over all the nodes in the list
+        for (int el = 0; el < dpl_size(list); el++) {
             int index;
 
-            element_t *element_at_index = (element_t*)dpl_get_element_at_index(list, count);
+            //get element from list
+            element_t *element_at_index = (element_t*)dpl_get_element_at_index(list, el);
 
+            //check if IDs match
             if (element_at_index->sensorID == sensor_data->id){
 
+                //Fill the array with sensor data
                 index = element_at_index->total_values % RUN_AVG_LENGTH;
                 element_at_index->avg[index] = sensor_data->value;
-
                 element_at_index->total_values = element_at_index->total_values+1;
 
+                //check if there are enough elements for calculation the average
                 if (element_at_index->total_values >= RUN_AVG_LENGTH){
+
+                    //calculation of the average
                     double avg = 0;
                     for (int count = 0; count < RUN_AVG_LENGTH; count++) {
                         avg = avg + element_at_index->avg[count];
                     }
                     avg = avg/RUN_AVG_LENGTH;
 
+                    //Check if something has to be logged
                     if (avg > SET_MAX_TEMP){
                         sprintf(data_mgr_log_message, "Sensor node %" PRIu16 " reports it’s too hot (avg temp = %f)", sensor_data->id, avg);
                         write(data_mgr_fd, data_mgr_log_message, SIZE);
@@ -106,20 +111,20 @@ void *init_data_manager(void *vargp){
                 }
 
                 element_at_index->last_modified = sensor_data->ts;
-                //printf("%hu %f %lld \n", element_at_index->sensorID, element_at_index->avg, (long long)element_at_index->last_modified);
                 break;
             }
 
-            if (count == dpl_size(list)-1){
+            //Log if ID doesn't exist
+            if (el == dpl_size(list)-1){
                 sprintf(data_mgr_log_message, "Received sensor data with invalid sensor node ID %" PRIu16, sensor_data->id);
                 write(data_mgr_fd, data_mgr_log_message, SIZE);
             }
         }
     }
 
+    //free malloced data
     free(element);
     free(sensor_data);
-
     datamgr_free();
     return 0;
 }
