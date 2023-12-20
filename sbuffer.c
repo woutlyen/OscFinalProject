@@ -33,6 +33,7 @@ int condition = 0;
 
 int sbuffer_init(sbuffer_t **buffer) {
 
+    //init mutexes and conditions
     if (pthread_mutex_init(&lock, NULL) != 0) {
         return SBUFFER_FAILURE;
     }
@@ -48,7 +49,6 @@ int sbuffer_init(sbuffer_t **buffer) {
     if (pthread_cond_init(&read_cond, NULL) != 0) {
         return SBUFFER_FAILURE;
     }
-
 
     *buffer = malloc(sizeof(sbuffer_t));
     if (*buffer == NULL) return SBUFFER_FAILURE;
@@ -70,6 +70,7 @@ int sbuffer_free(sbuffer_t **buffer) {
     free(*buffer);
     *buffer = NULL;
 
+    //destroy all the mutexes and conditions
     pthread_cond_destroy(&read_cond);
     pthread_mutex_destroy(&read_lock);
     pthread_cond_destroy(&cond);
@@ -81,9 +82,11 @@ int sbuffer_free(sbuffer_t **buffer) {
 
 int sbuffer_get_data(sbuffer_t *buffer, sensor_data_t *data) {
 
+    //check if buffer is empty
     if (buffer == NULL) {
         return SBUFFER_FAILURE;
     }
+
 
     pthread_mutex_lock(&read_lock);
     while (condition == 1){
