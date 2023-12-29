@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <pthread.h>
-#include <sys/time.h>
+
 #include <stdbool.h>
 #include "config.h"
 #include "lib/tcpsock.h"
@@ -34,8 +34,6 @@ void *init_connection_manager(void *vargp) {
     tcpsock_t *server, *client[MAX_CONN];
     int conn_counter = 0;
 
-    printf("Test server is started\n");
-
     //open tcp connection
     if (tcp_passive_open(&server, PORT) != TCP_NO_ERROR) exit(EXIT_FAILURE);
 
@@ -55,7 +53,6 @@ void *init_connection_manager(void *vargp) {
 
     //close the tcp connection
     if (tcp_close(&server) != TCP_NO_ERROR) exit(EXIT_FAILURE);
-    printf("Test server is shutting down\n");
 
 
     //init end of buffer node
@@ -111,7 +108,6 @@ void *connectionHandler(void *vargp){
 
             //insert tcp data in the buffer
             sbuffer_insert(buffer_connmgr, &data);
-            printf("sensor id = %" PRIu16 " - temperature = %f - timestamp = %ld\n", data.id, data.value, (long int) data.ts);
         }
 
         //check if this is the first data
@@ -129,13 +125,11 @@ void *connectionHandler(void *vargp){
 
     //log message based of result
     if (result == TCP_TIMEOUT_ERROR){
-        printf("Time-out: Peer has closed connection\n");
         char conn_mgr_log_message[SIZE] = "";
         sprintf(conn_mgr_log_message, "Time-out: Sensor node %" PRIu16 " has closed the connection", data.id);
         write(conn_mgr_fd, conn_mgr_log_message, SIZE);
     }
     else if (result == TCP_CONNECTION_CLOSED) {
-        printf("Peer has closed connection\n");
         char conn_mgr_log_message[SIZE] = "";
         sprintf(conn_mgr_log_message, "Sensor node %" PRIu16 " has closed the connection", data.id);
         write(conn_mgr_fd, conn_mgr_log_message, SIZE);

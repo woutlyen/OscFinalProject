@@ -4,7 +4,6 @@
 
 #include "datamgr.h"
 #include "lib/dplist.h"
-#include <assert.h>
 #include <unistd.h>
 #include <inttypes.h>
 

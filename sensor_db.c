@@ -3,7 +3,6 @@
  */
 
 #include <unistd.h>
-#include <string.h>
 #include <inttypes.h>
 #include "sensor_db.h"
 
